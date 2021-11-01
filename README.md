@@ -1,0 +1,2 @@
+# NewsArticleSearchEngine
+IR Group Project
