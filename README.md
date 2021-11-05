@@ -5,6 +5,7 @@ IR Group Project
 
 For the indexing to work, topics should be inside a directory called resources. The dataset should be inside a directory called newsarticles inside resources. I.e:
 
+```
 +-- src/main/java
 |   +-- *source code files*
 +-- resources
@@ -23,3 +24,4 @@ For the indexing to work, topics should be inside a directory called resources. 
 |   |   |   |   +-- fr94
 |   |   |   |   +-- ft
 |   |   |   |   +-- latimes
+```
