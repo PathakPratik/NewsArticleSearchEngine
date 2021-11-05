@@ -43,10 +43,10 @@ public class QueryIndex {
         DirectoryReader directoryReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
         indexSearcher.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
-        MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{FieldNames.TITLE.getName(),
+        MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{FieldNames.HEADLINE.getName(),
                 //FieldNames.AUTHOR.getName(),
                 //FieldNames.BIBLIOGRAPHY.getName(),
-                FieldNames.DESCRIPTION.getName()},
+                FieldNames.TEXT.getName()},
                 AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString));
 
         PrintWriter writer = new PrintWriter(cRANKINGS_LOCATION, StandardCharsets.UTF_8);

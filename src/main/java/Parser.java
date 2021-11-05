@@ -158,12 +158,13 @@ public class Parser {
                             documents.add(luceneDoc);
                         }
                     }
-
                     indexWriter.addDocuments(documents);
                 }
             }
             return true;
         } catch (Exception e) {
+            // TODO
+            e.printStackTrace();
             return false;
         }
     }
