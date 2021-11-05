@@ -3,6 +3,7 @@
 /**/_MACOSX/**
 /**/topics
 target/**
+./target
 /**/index
 .classpath
 .project
