@@ -29,6 +29,8 @@ public class Parser {
     // <! identifier for the similarity that is to be created from
     // AnalyzerSimilarityFactory
     private String mSimilarityString;
+    // Identifier used to separate collection into lucene documents
+    private static String DocumentSeparator = "<DOC>";
 
     Parser(String analyzer, String similarity) {
         mAnalyzerString = analyzer;
@@ -91,7 +93,6 @@ public class Parser {
      * @param dir Files are searched in this directory
      * @return List of all files to be indexed
      */
-
     private static ArrayList<File> getFilesFromDir(File dir){
         ArrayList<File> files = new ArrayList();
         for (File nested : dir.listFiles()) {
@@ -111,16 +112,14 @@ public class Parser {
      * @return boolean success value
      * @throws IOException
      */
-
     private static boolean indexCollections(String[] locations, IndexWriter indexWriter) throws IOException {
-
         for (String location: locations) {
             File dir = new File(location);
             List<Document> documents = new ArrayList<>();
 
             for (File file:getFilesFromDir(dir)) {
                 Scanner scan = new Scanner(file);
-                scan.useDelimiter(Pattern.compile("<DOC>"));
+                scan.useDelimiter(Pattern.compile(DocumentSeparator));
                 System.out.println(file.getName());
                 while (scan.hasNext()) {
                     String docRaw = scan.next();
@@ -138,9 +137,7 @@ public class Parser {
      * @param docRaw documents to be parsed
      * @return document parsed map of fields
      */
-
     private static Map formatDocument(String docRaw){
-
         org.jsoup.nodes.Document docu = Jsoup.parse(docRaw);
         String text = docu.body().select(FieldNames.TEXT.getName()).text();
         String docno = docu.body().select(FieldNames.DOCNO.getName()).text();
@@ -158,7 +155,6 @@ public class Parser {
      * @param doc Map of data to create a doc
      * @return Lucene document
      */
-
     private static Document createDocument(Map doc)
     {
         Document document = new Document();
