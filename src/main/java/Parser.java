@@ -5,30 +5,20 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import java.io.IOException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
 import java.nio.file.Files;
-import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
+import org.jsoup.*;
 
 public class Parser {
     // <! constant for an empty string
@@ -63,7 +53,7 @@ public class Parser {
     }
 
     /**
-     * This method extracts all the relevant info from the cran dataset that we need
+     * This method extracts all the relevant info from the dataset that we need
      * for creating the index. This method creates the index after extraction
      * 
      * @param ftLocation             location of the Financial Times Limited dataset
@@ -86,7 +76,8 @@ public class Parser {
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter indexWriter = new IndexWriter(directory, config);
 
-        boolean successful = indexFt(ftLocation, indexWriter);
+        String[] locations = {fbisLocation, latimesLocation, fr94Location};
+        boolean successful = indexCollections(locations, indexWriter) && indexFt(ftLocation, indexWriter);
 
         // add the created documents to the index and close everything
         indexWriter.close();
@@ -177,6 +168,87 @@ public class Parser {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * Generic function to recursively get all the files to be indexed from a directory
+     * @param dir Files are searched in this directory
+     * @return List of all files to be indexed
+     */
+
+    private static ArrayList<File> getFilesFromDir(File dir){
+        ArrayList<File> files = new ArrayList();
+        for (File nested : dir.listFiles()) {
+            if(nested.isDirectory()) {
+                files.addAll(getFilesFromDir(nested));
+            }else if( !nested.getName().matches(".*(read|Store).*") ){
+                files.add(nested);
+            }
+        }
+        return files;
+    }
+
+    /**
+     * This will index all the documents from FR94
+     * @param locations Location of FR94 dataset
+     * @param indexWriter the index writer used to create the index
+     * @return boolean success value
+     * @throws IOException
+     */
+
+    private static boolean indexCollections(String[] locations, IndexWriter indexWriter) throws IOException {
+
+        for (String location: locations) {
+            File dir = new File(location);
+            List<Document> documents = new ArrayList<>();
+
+            for (File file:getFilesFromDir(dir)) {
+                Scanner scan = new Scanner(file);
+                scan.useDelimiter(Pattern.compile("<DOC>"));
+                System.out.println(file.getName());
+                while (scan.hasNext()) {
+                    String docRaw = scan.next();
+                    Document luceneDoc = createDocument(formatDocument(docRaw));
+                    documents.add(luceneDoc);
+                }
+                indexWriter.addDocuments(documents);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Extracts documents for field information
+     * @param docRaw documents to be parsed
+     * @return document parsed map of fields
+     */
+
+    private static Map formatDocument(String docRaw){
+
+        org.jsoup.nodes.Document docu = Jsoup.parse(docRaw);
+        String text = docu.body().select(FieldNames.TEXT.getName()).text();
+        String docno = docu.body().select(FieldNames.DOCNO.getName()).text();
+
+        Map<String, String> doc = new HashMap<>();
+
+        doc.put(FieldNames.DOCNO.getName(), docno);
+        doc.put(FieldNames.TEXT.getName(), text);
+
+        return doc;
+    }
+
+    /**
+     * Creates a new Lucene document with given data
+     * @param doc Map of data to create a doc
+     * @return Lucene document
+     */
+
+    private static Document createDocument(Map doc)
+    {
+        Document document = new Document();
+        document.add(new TextField(FieldNames.DOCNO.getName(), doc.get(FieldNames.DOCNO.getName()).toString() , Field.Store.YES));
+        document.add(new TextField(FieldNames.TEXT.getName(), doc.get(FieldNames.TEXT.getName()).toString() , Field.Store.NO));
+        return document;
     }
 
     /**
