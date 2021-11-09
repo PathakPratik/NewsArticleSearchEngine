@@ -1,0 +1,13 @@
+/**/newsarticles/**
+/**/Assignment Two/**
+/**/_MACOSX/**
+/**/topics
+target/**
+./target
+/**/index
+.classpath
+.project
+.settings/
+dependency-reduced-pom.xml
+.idea/
+LuceneIntro.iml

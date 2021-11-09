@@ -1,9 +1,7 @@
 public enum FieldNames {
-    ID("id"),
-    TITLE("title"),
-    AUTHOR("author"),
-    BIBLIOGRAPHY("bibliography"),
-    DESCRIPTION("description");
+    DOCNO("docno"),
+    HEADLINE("headline"),
+    TEXT("text");
 
     private final String mName;
 
