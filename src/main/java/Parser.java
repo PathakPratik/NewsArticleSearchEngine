@@ -76,98 +76,14 @@ public class Parser {
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter indexWriter = new IndexWriter(directory, config);
 
-        String[] locations = {fbisLocation, latimesLocation, fr94Location};
-        boolean successful = indexCollections(locations, indexWriter) && indexFt(ftLocation, indexWriter);
+        String[] locations = {ftLocation, fbisLocation, latimesLocation, fr94Location};
+        boolean successful = indexCollections(locations, indexWriter);
 
         // add the created documents to the index and close everything
         indexWriter.close();
         directory.close();
         System.out.println("Indexing finished successfully");
         return successful;
-    }
-
-    /**
-     * This method extracts all the relevant info from the Financial Times Limited
-     * dataset that we need for creating the index. This method creates the index
-     * after extraction
-     * 
-     * @param ftLocation  location of the Financial Times Limited dataset
-     * @param indexWriter the index writer used to create the index
-     * @return true if parsing was successful. Otherwise, false
-     */
-    private boolean indexFt(String ftLocation, IndexWriter indexWriter) {
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            org.w3c.dom.Document xmlDoc;
-            Enumeration<InputStream> stream;
-            SequenceInputStream sequenceStream;
-
-            File dir = new File(ftLocation);
-            for (File nestedDir : dir.listFiles()) {
-                System.out.println(nestedDir.getName());
-                if (!nestedDir.getName().equals("readfrcg") && !nestedDir.getName().equals("readmeft") && !nestedDir.getName().equals(".DS_Store")) {
-                    for (File file : nestedDir.listFiles()) {
-                        System.out.println("    -" + file.getName());
-                        stream = Collections.enumeration(
-                                Arrays.asList(new InputStream[] { new ByteArrayInputStream("<root>".getBytes()),
-                                        new FileInputStream(file), new ByteArrayInputStream("</root>".getBytes()), }));
-                        sequenceStream = new SequenceInputStream(stream);
-                        xmlDoc = db.parse(sequenceStream);
-
-                        xmlDoc.getDocumentElement().normalize();
-                        NodeList nodeList = xmlDoc.getElementsByTagName("DOC");
-
-                        ArrayList<Document> documents = new ArrayList<>();
-
-                        for (int i = 0; i < nodeList.getLength(); i++) {
-                            Node node = nodeList.item(i);
-                            // System.out.println("\nNode Name:" + node.getNodeName());
-                            Element eElement = (Element) node;
-
-                            Document luceneDoc = new Document();
-                            boolean empty = true;
-
-                            String docNo = eElement.getElementsByTagName("DOCNO").item(0).getTextContent().replaceAll("\n(?!\n)", " ").trim();
-                            // System.out.println(docNo);
-                            if (!docNo.isEmpty()) {
-                                luceneDoc.add(new TextField(FieldNames.DOCNO.getName(), docNo, Field.Store.YES));
-                            }
-
-                            NodeList headlineField = eElement.getElementsByTagName("HEADLINE");
-                            String headline = "";
-                            if(headlineField.getLength() > 0)
-                                 headline = headlineField.item(0).getTextContent().replaceAll("\n(?!\n)", " ").trim();
-                            // System.out.println(headline);
-                            if (!headline.isEmpty()) {
-                                luceneDoc.add(new TextField(FieldNames.HEADLINE.getName(), headline, Field.Store.YES));
-                                empty = false;
-                            }
-
-                            NodeList textField = eElement.getElementsByTagName("TEXT");
-                            String text = "";
-                            if(textField.getLength() > 0)
-                                text = textField.item(0).getTextContent().replaceAll("\n(?!\n)", " ").trim();
-                            // System.out.println(text);
-                            if (!text.isEmpty()) {
-                                luceneDoc.add(new TextField(FieldNames.TEXT.getName(), text, Field.Store.YES));
-                                empty = false;
-                            }
-
-                            if (!empty) {
-                                documents.add(luceneDoc);
-                            }
-                        }
-                        indexWriter.addDocuments(documents);
-                    }
-                }
-            }
-            return true;
-        } catch (Exception e) {
-            // TODO
-            e.printStackTrace();
-            return false;
-        }
     }
 
     /**
