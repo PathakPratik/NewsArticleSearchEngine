@@ -25,7 +25,12 @@ public class LuceneSearchEngine {
         try {
             Parser parser = new Parser(args[0] /*the selected analyzer*/,
                     args[1] /*the selected similarity*/);
-            if(parser.createIndex(cFINANCIAL_TIMES_LIMITED_LOCATION, cFEDERAL_REGISTER_LOCATION, cFOREIGN_BROADCAST_INFORMATION_SERVICE_LOCATION, cLOS_ANGELES_LOCATION, cINDEX_DIRECTORY_LOCATION)) {
+            if(parser.createIndex(cFINANCIAL_TIMES_LIMITED_LOCATION, 
+                cFEDERAL_REGISTER_LOCATION, 
+                cFOREIGN_BROADCAST_INFORMATION_SERVICE_LOCATION, 
+                cLOS_ANGELES_LOCATION, 
+                cINDEX_DIRECTORY_LOCATION)) 
+            {
            //     HashMap<Integer,String> queries  = parser.createQueries(cTOPICS_LOCATION); // <- TODO: Implementation
            //     QueryIndex queryIndex = new QueryIndex(args[0] /*the selected analyzer*/,
            //             args[1] /*the selected similarity*/);
