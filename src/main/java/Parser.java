@@ -106,7 +106,7 @@ public class Parser {
             File dir = new File(ftLocation);
             for (File nestedDir : dir.listFiles()) {
                 System.out.println(nestedDir.getName());
-                if (!nestedDir.getName().equals("readfrcg") && !nestedDir.getName().equals("readmeft")) {
+                if (!nestedDir.getName().equals("readfrcg") && !nestedDir.getName().equals("readmeft") && !nestedDir.getName().equals(".DS_Store")) {
                     for (File file : nestedDir.listFiles()) {
                         System.out.println("    -" + file.getName());
                         stream = Collections.enumeration(
@@ -128,7 +128,7 @@ public class Parser {
                             Document luceneDoc = new Document();
                             boolean empty = true;
 
-                            String docNo = eElement.getElementsByTagName("DOCNO").item(0).getTextContent();
+                            String docNo = eElement.getElementsByTagName("DOCNO").item(0).getTextContent().replaceAll("\n(?!\n)", " ").trim();
                             // System.out.println(docNo);
                             if (!docNo.isEmpty()) {
                                 luceneDoc.add(new TextField(FieldNames.DOCNO.getName(), docNo, Field.Store.YES));
@@ -137,7 +137,7 @@ public class Parser {
                             NodeList headlineField = eElement.getElementsByTagName("HEADLINE");
                             String headline = "";
                             if(headlineField.getLength() > 0)
-                                 headline = headlineField.item(0).getTextContent();
+                                 headline = headlineField.item(0).getTextContent().replaceAll("\n(?!\n)", " ").trim();
                             // System.out.println(headline);
                             if (!headline.isEmpty()) {
                                 luceneDoc.add(new TextField(FieldNames.HEADLINE.getName(), headline, Field.Store.YES));
@@ -147,7 +147,7 @@ public class Parser {
                             NodeList textField = eElement.getElementsByTagName("TEXT");
                             String text = "";
                             if(textField.getLength() > 0)
-                                text = textField.item(0).getTextContent();
+                                text = textField.item(0).getTextContent().replaceAll("\n(?!\n)", " ").trim();
                             // System.out.println(text);
                             if (!text.isEmpty()) {
                                 luceneDoc.add(new TextField(FieldNames.TEXT.getName(), text, Field.Store.YES));
