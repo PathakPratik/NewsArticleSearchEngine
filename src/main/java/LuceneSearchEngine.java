@@ -1,4 +1,6 @@
 
+import org.apache.lucene.queryparser.classic.ParseException;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -48,8 +50,8 @@ public class LuceneSearchEngine {
             HashMap<Integer,String> queries  = parser.createQueries(cTOPICS_LOCATION);
             QueryIndex queryIndex = new QueryIndex(args[0] /*the selected analyzer*/,
                              args[1] /*the selected similarity*/);
-           //     queryIndex.queryMap(queries, cINDEX_DIRECTORY_LOCATION);
-        } catch (IOException e){ //| ParseException e) {
+            queryIndex.queryMap(queries, cINDEX_DIRECTORY_LOCATION);
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
             System.exit(1);
         }
