@@ -15,9 +15,9 @@ import java.util.HashMap;
 
 public class QueryIndex {
     //<! The maximum number of search results that are retrieved for a query
-    private final short cMAX_RESULTS = 1400;
+    private final short cMAX_RESULTS = 1000;
     //<! The location where the file with the rankings of the queries is stored
-    private final String cRANKINGS_LOCATION = "../../rankings.txt";
+    private final String cRANKINGS_LOCATION = "./rankings.txt";
     //<! identifier for the analyzer that is to be created from AnalyzerSimilarityFactory
     private String mAnalyzerString;
     //<! identifier for the similarity that is to be created from AnalyzerSimilarityFactory
@@ -31,7 +31,7 @@ public class QueryIndex {
 
     /**
      *  This function executes a set of queries on a given index and writes the resulting
-     *  hit scores into a file
+     *  hit scores into a file located at cRANKINGS_LOCATION
      *
      * @param queries a map <Integer,String> which maps id of a query to its search text
      * @param indexDirectoryLocation location where the created index should be stored
@@ -43,10 +43,7 @@ public class QueryIndex {
         DirectoryReader directoryReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
         indexSearcher.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
-        MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{FieldNames.HEADLINE.getName(),
-                //FieldNames.AUTHOR.getName(),
-                //FieldNames.BIBLIOGRAPHY.getName(),
-                FieldNames.TEXT.getName()},
+        MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{FieldNames.TEXT.getName()},
                 AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString));
 
         PrintWriter writer = new PrintWriter(cRANKINGS_LOCATION, StandardCharsets.UTF_8);
@@ -59,7 +56,7 @@ public class QueryIndex {
             for (ScoreDoc hit : hits)
             {
                 Document hitDoc = indexSearcher.doc(hit.doc);
-                writer.println(id + " 0 " + hitDoc.get("id") + " 0 " + hit.score + " OLIVER");
+                writer.println(id + " 0 " + hitDoc.get(FieldNames.DOCNO.getName()) + " 0 " + hit.score + " GROUP10");
             }
         }
 

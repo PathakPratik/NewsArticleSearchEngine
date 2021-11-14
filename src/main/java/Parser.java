@@ -5,24 +5,15 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.*;
 
 public class Parser {
-    // <! constant for an empty string
-    private final String cEMPTY_STRING = "";
     // <! identifier for the analyzer that is to be created from
     // AnalyzerSimilarityFactory
     private String mAnalyzerString;
@@ -30,28 +21,17 @@ public class Parser {
     // AnalyzerSimilarityFactory
     private String mSimilarityString;
     // Identifier used to separate collection into lucene documents
-    private static String DocumentSeparator = "<DOC>";
+    private static final String cDOCUMENT_SEPARATOR = "<DOC>";
+    // Identifier used to separate the individual queries
+    private static final String cQUERIES_SEPARATOR = "<top>";
+    // Identifier used to separate the individual queries
+    private static final String cQUERIES_TITLE = "title";
+    // Identifier used to separate the individual queries
+    private static final String cQUERIES_DESCRIPTION = "desc";
 
     Parser(String analyzer, String similarity) {
         mAnalyzerString = analyzer;
         mSimilarityString = similarity;
-    }
-
-    /**
-     * Extracts a substring from a string based on a regular expression
-     * 
-     * @param input the input string
-     * @param regex the regular expression
-     * @return the extracted substring. Return an empty string, if the regex did not
-     *         match
-     */
-    private String extractPattern(String input, String regex) {
-        Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(input);
-        if (matcher.find()) {
-            return matcher.group(0);
-        }
-        return cEMPTY_STRING;
     }
 
     /**
@@ -119,7 +99,7 @@ public class Parser {
 
             for (File file:getFilesFromDir(dir)) {
                 Scanner scan = new Scanner(file);
-                scan.useDelimiter(Pattern.compile(DocumentSeparator));
+                scan.useDelimiter(Pattern.compile(cDOCUMENT_SEPARATOR));
                 System.out.println(file.getName());
                 while (scan.hasNext()) {
                     String docRaw = scan.next();
@@ -164,30 +144,34 @@ public class Parser {
     }
 
     /**
-     * This method extracts the queries from the cran.qry file and writes them to a
+     * This method extracts the queries from the topics file and writes them to a
      * <Integer,String> map (id of the query is mapped to the search text).
      *
      * @param queryFileLocation the location of the file which contains the queries
      * @return a map <Integer,String> which maps id of a query to its search text
-     * @throws IOException if the cran query file could not be read in
+     * @throws IOException if the topics query file could not be read in
      */
-    public HashMap<Integer, String> createQueries(String queryFileLocation) throws IOException {
+    public static HashMap<Integer, String> createQueries(String queryFileLocation) throws IOException {
         System.out.println("Started extracting queries");
         HashMap<Integer, String> queryMap = new HashMap<>();
-        String content = new String(Files.readAllBytes(Paths.get(queryFileLocation)));
+        Scanner scan = new Scanner(new File(queryFileLocation));
+        scan.useDelimiter(Pattern.compile(cQUERIES_SEPARATOR));
 
-        // split the document into the single queries
-        String[] queries = content.split("(?=.I \\d{1,4}\\n)");
         int id = 1;
-        for (String currQuery : queries) {
-            // extract the query text
-            String queryText = extractPattern(currQuery, "(?<=.W\\n).*");
-
-            if (!queryText.isEmpty()) {
-                queryMap.put(id, queryText);
-            }
+        while (scan.hasNext()) {
+            String docRaw = scan.next();
+            org.jsoup.nodes.Document docu = Jsoup.parse(docRaw);
+            String title = docu.body().select(cQUERIES_TITLE).text();
+            String description = docu.body().select(cQUERIES_DESCRIPTION).
+                    get(0).
+                    ownText().
+                    replace("Description: ", "");   // the desc tag always contains a first line
+                                                                    // "Description: ". We replace this, since
+                                                                    // this is of no use for the queries
+            queryMap.put(id, title + " " + description);
             id++;
         }
+
         System.out.println("Finished extracting queries");
         return queryMap;
     }
