@@ -28,6 +28,9 @@ public class Parser {
     private static final String cQUERIES_TITLE = "title";
     // Identifier used to separate the individual queries
     private static final String cQUERIES_DESCRIPTION = "desc";
+    // Identifier used to identify the topic number
+    private static final String cQUERIES_NUM = "num";
+
 
     Parser(String analyzer, String similarity) {
         mAnalyzerString = analyzer;
@@ -157,10 +160,12 @@ public class Parser {
         Scanner scan = new Scanner(new File(queryFileLocation));
         scan.useDelimiter(Pattern.compile(cQUERIES_SEPARATOR));
 
-        int id = 1;
+        //int id = 1;
         while (scan.hasNext()) {
             String docRaw = scan.next();
             org.jsoup.nodes.Document docu = Jsoup.parse(docRaw);
+            String idText = docu.body().select(cQUERIES_NUM).text();
+            int id = Integer.parseInt(idText.split(" ")[1]);
             String title = docu.body().select(cQUERIES_TITLE).text();
             String description = docu.body().select(cQUERIES_DESCRIPTION).
                     get(0).
