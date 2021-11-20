@@ -173,7 +173,8 @@ public class Parser {
                     replace("Description: ", "");   // the desc tag always contains a first line
                                                                     // "Description: ". We replace this, since
                                                                     // this is of no use for the queries
-            queryMap.put(id, title + " " + description);
+            String narrative = docu.body().select("narr").text().replace("Narrative: ", "").replace("relevant", "").replace("documents", "").replace("document", "").replace("also", "");
+            queryMap.put(id, title + " " + description + " " + narrative);
             id++;
         }
 
