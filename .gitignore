@@ -12,3 +12,4 @@ dependency-reduced-pom.xml
 .idea/
 LuceneIntro.iml
 trec_eval/
+rankings.txt
