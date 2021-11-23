@@ -21,7 +21,7 @@ public class Parser {
     // AnalyzerSimilarityFactory
     private String mSimilarityString;
     // Identifier used to separate collection into lucene documents
-    public static final String cDOCUMENT_SEPARATOR = "<DOC>";
+    private static final String cDOCUMENT_SEPARATOR = "<DOC>";
     // Identifier used to separate the individual queries
     private static final String cQUERIES_SEPARATOR = "<top>";
     // Identifier used to separate the individual queries
