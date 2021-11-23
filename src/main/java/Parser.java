@@ -113,7 +113,7 @@ public class Parser {
                 }
 
                 i++;
-                if(i >= 100){
+                if(i >= 200){
                     indexWriter.addDocuments(documents);
                     documents = new ArrayList<>();
                     i = 0;

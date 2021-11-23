@@ -37,15 +37,14 @@ public class CustomAnalyzer extends Analyzer {
 
         try {
         final Tokenizer tokenizer = new StandardTokenizer();
-        TokenStream tokenStream = new ClassicFilter(tokenizer);
-        tokenStream = new LowerCaseFilter(tokenStream);
-
-        WordnetSynonymParser parser = new WordnetSynonymParser(true, true, new SimpleAnalyzer());
+        WordnetSynonymParser parser = new WordnetSynonymParser(true, false, new SimpleAnalyzer());
         File file = new File(cWORDNET_DATABASE_LOCATION);
         FileReader fr = new FileReader(file);
         parser.parse(fr);
         SynonymMap synonymMap = parser.build();
-        tokenStream = new SynonymGraphFilter(tokenStream, synonymMap, true);
+        TokenStream tokenStream = new SynonymGraphFilter(tokenizer, synonymMap, true);
+        tokenStream = new ClassicFilter(tokenStream);
+        tokenStream = new LowerCaseFilter(tokenStream);
         tokenStream = new TrimFilter(tokenStream);
         tokenStream = new EnglishPossessiveFilter(tokenStream);
         tokenStream = new HyphenatedWordsFilter(tokenStream);
