@@ -1,4 +1,5 @@
 import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.en.EnglishPossessiveFilter;
@@ -37,7 +38,7 @@ public class CustomAnalyzer extends Analyzer {
 
         try {
         final Tokenizer tokenizer = new StandardTokenizer();
-        WordnetSynonymParser parser = new WordnetSynonymParser(true, false, new SimpleAnalyzer());
+        WordnetSynonymParser parser = new WordnetSynonymParser(true, true, new KeywordAnalyzer());
         File file = new File(cWORDNET_DATABASE_LOCATION);
         FileReader fr = new FileReader(file);
         parser.parse(fr);

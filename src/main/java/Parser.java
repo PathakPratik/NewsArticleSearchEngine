@@ -111,9 +111,8 @@ public class Parser {
                     Document luceneDoc = createDocument(formatDocument(docRaw));
                     documents.add(luceneDoc);
                 }
-
                 i++;
-                if(i >= 200){
+                if(i >= 250){
                     indexWriter.addDocuments(documents);
                     documents = new ArrayList<>();
                     i = 0;
