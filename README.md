@@ -32,3 +32,6 @@ I.e:
 |   |   |   |   +-- ft
 |   |   |   |   +-- latimes
 ```
+
+## Acknowledgements
+Princeton University "About WordNet." WordNet. Princeton University. 2010. 

@@ -21,7 +21,7 @@ public class Parser {
     // AnalyzerSimilarityFactory
     private String mSimilarityString;
     // Identifier used to separate collection into lucene documents
-    private static final String cDOCUMENT_SEPARATOR = "<DOC>";
+    public static final String cDOCUMENT_SEPARATOR = "<DOC>";
     // Identifier used to separate the individual queries
     private static final String cQUERIES_SEPARATOR = "<top>";
     // Identifier used to separate the individual queries
@@ -76,7 +76,7 @@ public class Parser {
      * @param dir Files are searched in this directory
      * @return List of all files to be indexed
      */
-    private static ArrayList<File> getFilesFromDir(File dir){
+    public static ArrayList<File> getFilesFromDir(File dir){
         ArrayList<File> files = new ArrayList();
         for (File nested : dir.listFiles()) {
             if(nested.isDirectory()) {
@@ -98,9 +98,11 @@ public class Parser {
     private static boolean indexCollections(String[] locations, IndexWriter indexWriter) throws IOException {
         for (String location: locations) {
             File dir = new File(location);
+            int i = 0;
             List<Document> documents = new ArrayList<>();
 
             for (File file:getFilesFromDir(dir)) {
+
                 Scanner scan = new Scanner(file);
                 scan.useDelimiter(Pattern.compile(cDOCUMENT_SEPARATOR));
                 System.out.println(file.getName());
@@ -109,6 +111,14 @@ public class Parser {
                     Document luceneDoc = createDocument(formatDocument(docRaw));
                     documents.add(luceneDoc);
                 }
+
+                i++;
+                if(i >= 100){
+                    indexWriter.addDocuments(documents);
+                    documents = new ArrayList<>();
+                    i = 0;
+                }
+                scan.close();
             }
             indexWriter.addDocuments(documents);
         }

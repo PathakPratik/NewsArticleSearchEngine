@@ -1,4 +1,6 @@
 import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.en.EnglishPossessiveFilter;
 import org.apache.lucene.analysis.en.KStemFilter;
 import org.apache.lucene.analysis.en.PorterStemFilter;
@@ -8,8 +10,13 @@ import org.apache.lucene.analysis.miscellaneous.PatternKeywordMarkerFilter;
 import org.apache.lucene.analysis.miscellaneous.TrimFilter;
 import org.apache.lucene.analysis.standard.ClassicFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.apache.lucene.analysis.synonym.SynonymGraphFilter;
+import org.apache.lucene.analysis.synonym.SynonymMap;
+import org.apache.lucene.analysis.synonym.WordnetSynonymParser;
 import org.apache.lucene.analysis.tr.ApostropheFilter;
 
+import java.io.File;
+import java.io.FileReader;
 import java.util.Arrays;
 
 public class CustomAnalyzer extends Analyzer {
@@ -23,12 +30,22 @@ public class CustomAnalyzer extends Analyzer {
     };
 
     private CharArraySet mStopWordCharArrayList = new CharArraySet(Arrays.asList(mStopWordList),true);
+    private static final String cWORDNET_DATABASE_LOCATION = "./resources/wn_s.pl";
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
+
+        try {
         final Tokenizer tokenizer = new StandardTokenizer();
         TokenStream tokenStream = new ClassicFilter(tokenizer);
         tokenStream = new LowerCaseFilter(tokenStream);
+
+        WordnetSynonymParser parser = new WordnetSynonymParser(true, true, new SimpleAnalyzer());
+        File file = new File(cWORDNET_DATABASE_LOCATION);
+        FileReader fr = new FileReader(file);
+        parser.parse(fr);
+        SynonymMap synonymMap = parser.build();
+        tokenStream = new SynonymGraphFilter(tokenStream, synonymMap, true);
         tokenStream = new TrimFilter(tokenStream);
         tokenStream = new EnglishPossessiveFilter(tokenStream);
         tokenStream = new HyphenatedWordsFilter(tokenStream);
@@ -36,7 +53,14 @@ public class CustomAnalyzer extends Analyzer {
         tokenStream = new PorterStemFilter(tokenStream);
         tokenStream = new KStemFilter(tokenStream);
         tokenStream = new StopFilter(tokenStream, mStopWordCharArrayList);
+
         return new TokenStreamComponents(tokenizer, tokenStream);
+    }
+    catch (Exception e) {
+        e.printStackTrace();
+        System.err.println("uh oh");
+        return null;
+    }
     }
 
 

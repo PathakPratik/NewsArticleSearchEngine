@@ -11,13 +11,13 @@ public class LuceneSearchEngine {
     private static final String cINDEX_DIRECTORY_LOCATION = "./index";
 
     //!<the location where the financial times limited files are stored
-    private static final String cFINANCIAL_TIMES_LIMITED_LOCATION = "./resources/newsarticles/Assignment Two/ft";
+    public static final String cFINANCIAL_TIMES_LIMITED_LOCATION = "./resources/newsarticles/Assignment Two/ft";
     //!<the location where the federal register files are stored
-    private static final String cFEDERAL_REGISTER_LOCATION = "./resources/newsarticles/Assignment Two/fr94";
+    public static final String cFEDERAL_REGISTER_LOCATION = "./resources/newsarticles/Assignment Two/fr94";
     //!<the location where the foreign broadcast information service files are stored
-    private static final String cFOREIGN_BROADCAST_INFORMATION_SERVICE_LOCATION = "./resources/newsarticles/Assignment Two/fbis";
+    public static final String cFOREIGN_BROADCAST_INFORMATION_SERVICE_LOCATION = "./resources/newsarticles/Assignment Two/fbis";
     //!<the location where the los angeles times files are stored
-    private static final String cLOS_ANGELES_LOCATION = "./resources/newsarticles/Assignment Two/latimes";
+    public static final String cLOS_ANGELES_LOCATION = "./resources/newsarticles/Assignment Two/latimes";
     //!<the location where the topics file is stored
     private static final String cTOPICS_LOCATION = "./resources/topics/topics";
 
