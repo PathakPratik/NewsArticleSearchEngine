@@ -36,7 +36,7 @@ public class CustomAnalyzer extends Analyzer {
 
         try {
         final Tokenizer tokenizer = new StandardTokenizer();
-        WordnetSynonymParser parser = new WordnetSynonymParser(true, true, new KeywordAnalyzer());
+        WordnetSynonymParser parser = new WordnetSynonymParser(true, false, new KeywordAnalyzer());
         File file = new File(cWORDNET_DATABASE_LOCATION);
         FileReader fr = new FileReader(file);
         parser.parse(fr);
