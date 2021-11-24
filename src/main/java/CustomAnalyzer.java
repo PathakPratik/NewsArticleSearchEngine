@@ -1,4 +1,5 @@
 import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.FlattenGraphFilter;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.en.EnglishPossessiveFilter;
 import org.apache.lucene.analysis.en.KStemFilter;
@@ -42,6 +43,7 @@ public class CustomAnalyzer extends Analyzer {
         parser.parse(fr);
         SynonymMap synonymMap = parser.build();
         TokenStream tokenStream = new SynonymGraphFilter(tokenizer, synonymMap, true);
+        tokenStream = new FlattenGraphFilter(tokenStream);
         tokenStream = new ClassicFilter(tokenStream);
         tokenStream = new LowerCaseFilter(tokenStream);
         tokenStream = new TrimFilter(tokenStream);
