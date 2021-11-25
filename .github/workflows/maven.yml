@@ -25,6 +25,6 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Remove Index
-      run: rm -r index/
+      run: rm -r -f index/
     - name: Run
       run: java -jar target/LuceneIntro-1.0.jar custom bm25
