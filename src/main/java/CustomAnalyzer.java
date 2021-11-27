@@ -19,10 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CustomAnalyzer extends Analyzer {
-
-    //
-    private static String cSTOPWORDLIST_LOCATION = "./resources/common_words";
-
     private final String[] mStopWordList = {
             "a", "an", "and", "are","aren't", "as", "at", "be", "but", "by","can","can't", "does","how",
             "for", "if", "in", "into", "is", "it","have","haven't","why","has",
@@ -31,34 +27,7 @@ public class CustomAnalyzer extends Analyzer {
             "they", "this", "to","too", "what", "was", "will", "with","where"
     };
 
-    private String[] createStopWordList() throws IOException {
-        BufferedReader bufferedReader = null;
-        try {
-            bufferedReader = new BufferedReader(new FileReader(cSTOPWORDLIST_LOCATION));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        List<String> lines = new ArrayList<String>();
-        String line = "";
-        while((line = bufferedReader.readLine()) != null) {
-            System.out.println(line);
-            lines.add(line);
-        }
-        bufferedReader.close();
-        return lines.toArray(new String[]{});
-    }
-
-    private String[] stopWordList;
-
-    {
-        try {
-            stopWordList = createStopWordList();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private CharArraySet mStopWordCharArrayList = new CharArraySet(Arrays.asList(stopWordList),true);
+    private CharArraySet mStopWordCharArrayList = new CharArraySet(Arrays.asList(mStopWordList),true);
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
