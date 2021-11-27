@@ -142,7 +142,7 @@ public class Parser {
     {
         Document document = new Document();
         document.add(new TextField(FieldNames.DOCNO.getName(), doc.get(FieldNames.DOCNO.getName()).toString() , Field.Store.YES));
-        document.add(new TextField(FieldNames.TEXT.getName(), doc.get(FieldNames.TEXT.getName()).toString() , Field.Store.NO));
+        document.add(new TextField(FieldNames.TEXT.getName(), doc.get(FieldNames.TEXT.getName()).toString() , Field.Store.YES));
         return document;
     }
 

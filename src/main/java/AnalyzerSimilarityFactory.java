@@ -28,7 +28,7 @@ public class AnalyzerSimilarityFactory {
         }
 
         System.out.println("WARNING! NO VALID ANALYZER SELECTED");
-        return null;
+        return new StandardAnalyzer();
     }
 
     /**
@@ -49,6 +49,6 @@ public class AnalyzerSimilarityFactory {
             return new LMDirichletSimilarity();
         }
         System.out.println("WARNING! NO VALID SIMILARITY SELECTED");
-        return null;
+        return new BM25Similarity();
     }
 }
