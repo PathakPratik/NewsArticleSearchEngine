@@ -30,9 +30,9 @@ public class CustomAnalyzer extends Analyzer {
         tokenStream = new EnglishPossessiveFilter(tokenStream);
         tokenStream = new HyphenatedWordsFilter(tokenStream);
         tokenStream = new ASCIIFoldingFilter(tokenStream);
+        tokenStream = new StopFilter(tokenStream, mStopWordCharArrayList);
         tokenStream = new PorterStemFilter(tokenStream);
         tokenStream = new KStemFilter(tokenStream);
-        tokenStream = new StopFilter(tokenStream, mStopWordCharArrayList);
         return new TokenStreamComponents(tokenizer, tokenStream);
     }
 

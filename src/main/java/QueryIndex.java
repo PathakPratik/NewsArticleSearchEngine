@@ -23,13 +23,15 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class QueryIndex {
-    //<!
+    //<! The number of terms the original query is expanded with
     private final short cTOP_TERMS_LIMIT = 20;
-    //<!
+    //<! The weight factor for the terms that are used for query expansion
     private final float cEXPANDED_TERM_WEIGHT = 0.5F;
-    //<!
+    //<! The weight factor for the terms of the original query
+    private final float cQUERY_TERM_WEIGHT = 1.0F;
+    //<! The maximum number of search results that are retrieved for the first iteration of the query
     private final short cMAX_RESULTS_FIRST_PASS = 10;
-    //<! The maximum number of search results that are retrieved for a query
+    //<! The maximum number of search results that are retrieved for the final query
     private final short cMAX_RESULTS_SECOND_PASS = 1000;
     //<! The location where the file with the rankings of the queries is stored
     private final String cRANKINGS_LOCATION = "./rankings.txt";
@@ -86,7 +88,6 @@ public class QueryIndex {
         PrintWriter writer = new PrintWriter(cRANKINGS_LOCATION, StandardCharsets.UTF_8);
         System.out.println("Started querying");
         for (int id : queries.keySet()) {
-            //parse the current original query and use it to search the index
             Query origQuery = parser.parse(QueryParser.escape(queries.get(id)));
 
             //get top results for first iteration of the query and extract their terms
@@ -97,7 +98,6 @@ public class QueryIndex {
                 Document hitDoc = indexSearcher.doc(hit.doc);
                 List<String> termList = tokenizeString(Arrays.toString(hitDoc.getValues(FieldNames.TEXT.getName())));
                 for (String currTerm : termList) {
-
                     termWeightMap.put(currTerm, calculateTermWeight(currTerm,
                                                             termList,
                                                             indexSearcher,
@@ -110,17 +110,18 @@ public class QueryIndex {
             //reduce map to top @cTOP_TERMS_LIMIT terms
             topTermMap = topTermMap.entrySet().stream().limit(cTOP_TERMS_LIMIT)
                     .collect(TreeMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll);
+            double  maxTermWeight = (Collections.max(topTermMap.values()));
 
             //construct the final query with the extracted terms
-            BooleanQuery finalQuery = new BooleanQuery.Builder().add(origQuery, BooleanClause.Occur.SHOULD).build();
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append(origQuery.toString()).append(" ");
             for (String currTerm : topTermMap.keySet()){
-                TermQuery termQuery = new TermQuery(new Term(FieldNames.TEXT.getName(),currTerm));
-                BoostQuery boostQuery = new BoostQuery(termQuery, cEXPANDED_TERM_WEIGHT);
-                finalQuery = new BooleanQuery.Builder().add(finalQuery, BooleanClause.Occur.SHOULD).
-                        add(boostQuery, BooleanClause.Occur.SHOULD).build();
+                float weight = (float) (cEXPANDED_TERM_WEIGHT * (topTermMap.get(currTerm)/maxTermWeight));
+                //boost the terms
+                queryBuilder.append(currTerm).append("^").append(weight).append(" ");
             }
-
-            //finally, get the final results with the expanded query
+            Query finalQuery = parser.parse(queryBuilder.toString());
+            //get the final results with the expanded query
             hits = indexSearcher.search(finalQuery, cMAX_RESULTS_SECOND_PASS).scoreDocs;
             for (ScoreDoc hit : hits)
             {
@@ -159,23 +160,28 @@ public class QueryIndex {
     }
 
     /**
+     * This function calculates the tf * idf weight for a term in a document
      *
-     * @param term
-     * @param termList
-     * @param searcher
-     * @param reader
+     * @param term the term which we want to calculate the weight for
+     * @param termList the list of all terms in a document
+     * @param indexSearcher we need the indexSearcher to get the total number of docs in the index
+     * @param indexReader we need the indexReader to read out the doc frequency
      * @return the calculated term weight
      */
     private double calculateTermWeight(String term,
                                        List<String> termList,
-                                       IndexSearcher searcher,
-                                       IndexReader reader) {
+                                       IndexSearcher indexSearcher,
+                                       IndexReader indexReader) {
         CollectionStatistics collectionStats = null;
         try {
-            collectionStats = searcher.collectionStatistics(FieldNames.TEXT.getName());
+            collectionStats = indexSearcher.collectionStatistics(FieldNames.TEXT.getName());
             double totalDocCount = collectionStats.docCount();
             Term termInstance = new Term(FieldNames.TEXT.getName(),term);
-            double docCountWithTerm = reader.docFreq(termInstance);
+            double docCountWithTerm = indexReader.docFreq(termInstance);
+            if(docCountWithTerm == 0){
+                return 0;
+            }
+            //formulas taken from this paper: http://www.inf.ed.ac.uk/teaching/courses/tts/papers/singhal.pdf
             double tf = 1 + Math.log(1 + Math.log((double)Collections.frequency(termList,term)));
             double idf = Math.log10((totalDocCount+1)/docCountWithTerm);
             return tf*idf;
