@@ -27,8 +27,6 @@ public class QueryIndex {
     private final short cTOP_TERMS_LIMIT = 20;
     //<! The weight factor for the terms that are used for query expansion
     private final float cEXPANDED_TERM_WEIGHT = 0.5F;
-    //<! The weight factor for the terms of the original query
-    private final float cQUERY_TERM_WEIGHT = 1.0F;
     //<! The maximum number of search results that are retrieved for the first iteration of the query
     private final short cMAX_RESULTS_FIRST_PASS = 10;
     //<! The maximum number of search results that are retrieved for the final query
@@ -99,9 +97,9 @@ public class QueryIndex {
                 List<String> termList = tokenizeString(Arrays.toString(hitDoc.getValues(FieldNames.TEXT.getName())));
                 for (String currTerm : termList) {
                     termWeightMap.put(currTerm, calculateTermWeight(currTerm,
-                                                            termList,
-                                                            indexSearcher,
-                                                            indexReader));
+                            termList,
+                            indexSearcher,
+                            indexReader));
                 }
             }
             //rank all terms from the top documents, so we can get the top @cTOP_TERMS_LIMIT terms
@@ -117,7 +115,7 @@ public class QueryIndex {
             queryBuilder.append(origQuery.toString()).append(" ");
             for (String currTerm : topTermMap.keySet()){
                 float weight = (float) (cEXPANDED_TERM_WEIGHT * (topTermMap.get(currTerm)/maxTermWeight));
-                //boost the terms
+                //add weights to terms
                 queryBuilder.append(currTerm).append("^").append(weight).append(" ");
             }
             Query finalQuery = parser.parse(queryBuilder.toString());
