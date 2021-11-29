@@ -4,16 +4,13 @@ import org.apache.lucene.analysis.en.KStemFilter;
 import org.apache.lucene.analysis.en.PorterStemFilter;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 import org.apache.lucene.analysis.miscellaneous.HyphenatedWordsFilter;
-import org.apache.lucene.analysis.miscellaneous.PatternKeywordMarkerFilter;
 import org.apache.lucene.analysis.miscellaneous.TrimFilter;
 import org.apache.lucene.analysis.standard.ClassicFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.lucene.analysis.tr.ApostropheFilter;
 
 import java.util.Arrays;
 
 public class CustomAnalyzer extends Analyzer {
-
     private final String[] mStopWordList = {
             "a", "an", "and", "are","aren't", "as", "at", "be", "but", "by","can","can't", "does","how",
             "for", "if", "in", "into", "is", "it","have","haven't","why","has",
@@ -33,13 +30,10 @@ public class CustomAnalyzer extends Analyzer {
         tokenStream = new EnglishPossessiveFilter(tokenStream);
         tokenStream = new HyphenatedWordsFilter(tokenStream);
         tokenStream = new ASCIIFoldingFilter(tokenStream);
+        tokenStream = new StopFilter(tokenStream, mStopWordCharArrayList);
         tokenStream = new PorterStemFilter(tokenStream);
         tokenStream = new KStemFilter(tokenStream);
-        tokenStream = new StopFilter(tokenStream, mStopWordCharArrayList);
         return new TokenStreamComponents(tokenizer, tokenStream);
     }
-
-
-
 
 }
