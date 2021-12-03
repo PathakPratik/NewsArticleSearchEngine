@@ -81,7 +81,7 @@ public class QueryIndex {
         IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
         indexSearcher.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
         MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{FieldNames.TEXT.getName()},
-                AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString));
+                AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query"));
 
         PrintWriter writer = new PrintWriter(cRANKINGS_LOCATION, StandardCharsets.UTF_8);
         System.out.println("Started querying");
@@ -145,7 +145,7 @@ public class QueryIndex {
     private List<String> tokenizeString(String string) {
         List<String> result = new ArrayList<String>();
         try {
-            Analyzer analyzer = AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString);
+            Analyzer analyzer = AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query");
             TokenStream stream  = analyzer.tokenStream(null, new StringReader(string));
             stream.reset();
             while (stream.incrementToken()) {

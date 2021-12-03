@@ -13,7 +13,7 @@ public class AnalyzerSimilarityFactory {
      * @param analyzerType the analyzer that should be returned
      * @return the respective analyzer
      */
-    public static Analyzer getAnalyzer(String analyzerType){
+    public static Analyzer getAnalyzer(String analyzerType, String stage){
         if(analyzerType.equalsIgnoreCase("standard")) {
             return new StandardAnalyzer();
         }
@@ -24,7 +24,11 @@ public class AnalyzerSimilarityFactory {
             return new WhitespaceAnalyzer();
         }
         if(analyzerType.equalsIgnoreCase("custom")) {
-            return new CustomAnalyzer();
+            if(stage.equalsIgnoreCase("index")) {
+                return new CustomIndexAnalyzer();
+            } else if(stage.equalsIgnoreCase("query")){
+                return new CustomQueryAnalyzer();
+            }
         }
 
         System.out.println("WARNING! NO VALID ANALYZER SELECTED");
