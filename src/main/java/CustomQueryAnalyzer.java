@@ -22,7 +22,7 @@ public class CustomQueryAnalyzer extends Analyzer {
     private CharArraySet mStopWordCharArrayList = new CharArraySet(Arrays.asList(mStopWordList),true);
 
     public CustomQueryAnalyzer(CharArraySet stopList) {
-        this.mStopWordCharArrayList = stopList;
+        this.mStopWordCharArrayList.addAll(stopList);
     }
 
     @Override
