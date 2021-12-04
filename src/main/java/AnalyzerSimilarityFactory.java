@@ -19,16 +19,16 @@ public class AnalyzerSimilarityFactory {
      * @param analyzerType the analyzer that should be returned
      * @return the respective analyzer
      */
-    public static Analyzer getAnalyzer(String analyzerType, String stage, CharArraySet stopSet) throws FileNotFoundException {
+    public static Analyzer getAnalyzer(String analyzerType, String stage) throws FileNotFoundException {
 
-        Scanner s = new Scanner(new File("./freqlist.txt"));
-        ArrayList<String> stopWordlist = new ArrayList<String>();
-        while (s.hasNext()){
-            stopWordlist.add(s.next());
-        }
-        s.close();
-
-        CharArraySet HighFreqStopSet = new CharArraySet(stopWordlist, true);
+//        Scanner s = new Scanner(new File("./freqlist.txt"));
+//        ArrayList<String> stopWordlist = new ArrayList<String>();
+//        while (s.hasNext()){
+//            stopWordlist.add(s.next());
+//        }
+//        s.close();
+//
+//        CharArraySet HighFreqStopSet = new CharArraySet(stopWordlist, true);
 
         if(analyzerType.equalsIgnoreCase("standard")) {
             return new StandardAnalyzer();
@@ -41,9 +41,11 @@ public class AnalyzerSimilarityFactory {
         }
         if(analyzerType.equalsIgnoreCase("custom")) {
             if(stage.equalsIgnoreCase("index")) {
-                return new CustomIndexAnalyzer(HighFreqStopSet);
+//                return new CustomIndexAnalyzer(HighFreqStopSet);
+                return new CustomIndexAnalyzer();
             } else if(stage.equalsIgnoreCase("query")){
-                return new CustomQueryAnalyzer(HighFreqStopSet);
+//                return new CustomQueryAnalyzer(HighFreqStopSet);
+                return new CustomQueryAnalyzer();
             }
         }
 

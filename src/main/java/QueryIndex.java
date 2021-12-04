@@ -88,27 +88,27 @@ public class QueryIndex {
         IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
         indexSearcher.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
 
-        FileWriter writer1 = new FileWriter(cFREQ_LIST_LOCATION);
-
-        org.apache.lucene.misc.TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, 1500, "text", new HighFreqTerms.TotalTermFreqComparator());
-
-        ArrayList<String> stopWordlist = new ArrayList<String>();
-
-        for (org.apache.lucene.misc.TermStats commonTerm : commonTerms) {
-            if( commonTerm.totalTermFreq > 180000 ) {
-                stopWordlist.add(commonTerm.termtext.utf8ToString());
-                writer1.write(commonTerm.termtext.utf8ToString() + System.lineSeparator());
-            }
-        }
-
-        System.out.println(stopWordlist.size());
-
-        CharArraySet stopSet = new CharArraySet(stopWordlist, true);
-
-        writer1.close();
+//        FileWriter writer1 = new FileWriter(cFREQ_LIST_LOCATION);
+//
+//        org.apache.lucene.misc.TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, 2500, "text", new HighFreqTerms.TotalTermFreqComparator());
+//
+//        ArrayList<String> stopWordlist = new ArrayList<String>();
+//
+//        for (org.apache.lucene.misc.TermStats commonTerm : commonTerms) {
+//            if( commonTerm.totalTermFreq > 180000 ) {
+//                stopWordlist.add(commonTerm.termtext.utf8ToString());
+//                writer1.write(commonTerm.termtext.utf8ToString() + System.lineSeparator());
+//            }
+//        }
+//
+//        System.out.println(stopWordlist.size());
+//
+//        CharArraySet stopSet = new CharArraySet(stopWordlist, true);
+//
+//        writer1.close();
 
         MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{FieldNames.TEXT.getName()},
-                AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query", stopSet));
+                AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query"));
 
         PrintWriter writer = new PrintWriter(cRANKINGS_LOCATION, StandardCharsets.UTF_8);
         System.out.println("Started querying");
@@ -121,7 +121,7 @@ public class QueryIndex {
             for (ScoreDoc hit : hits)
             {
                 Document hitDoc = indexSearcher.doc(hit.doc);
-                List<String> termList = tokenizeString(Arrays.toString(hitDoc.getValues(FieldNames.TEXT.getName())), stopSet);
+                List<String> termList = tokenizeString(Arrays.toString(hitDoc.getValues(FieldNames.TEXT.getName())));
                 for (String currTerm : termList) {
                     termWeightMap.put(currTerm, calculateTermWeight(currTerm,
                             termList,
@@ -169,10 +169,10 @@ public class QueryIndex {
      *  @return the tokenized string
      */
     //Credits: https://stackoverflow.com/questions/6334692/how-to-use-a-lucene-analyzer-to-tokenize-a-string
-    private List<String> tokenizeString(String string, CharArraySet stopSet) {
+    private List<String> tokenizeString(String string) {
         List<String> result = new ArrayList<String>();
         try {
-            Analyzer analyzer = AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query", stopSet);
+            Analyzer analyzer = AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query");
             TokenStream stream  = analyzer.tokenStream(null, new StringReader(string));
             stream.reset();
             while (stream.incrementToken()) {

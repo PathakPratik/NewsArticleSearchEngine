@@ -21,9 +21,9 @@ public class CustomQueryAnalyzer extends Analyzer {
 
     private CharArraySet mStopWordCharArrayList = new CharArraySet(Arrays.asList(mStopWordList),true);
 
-    public CustomQueryAnalyzer(CharArraySet stopList) {
-        this.mStopWordCharArrayList.addAll(stopList);
-    }
+//    public CustomQueryAnalyzer(CharArraySet stopList) {
+//        this.mStopWordCharArrayList.addAll(stopList);
+//    }
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
