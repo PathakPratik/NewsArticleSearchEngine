@@ -21,6 +21,10 @@ public class CustomQueryAnalyzer extends Analyzer {
 
     private CharArraySet mStopWordCharArrayList = new CharArraySet(Arrays.asList(mStopWordList),true);
 
+    public CustomQueryAnalyzer(CharArraySet HighFreqStopSet) {
+        this.mStopWordCharArrayList.addAll(HighFreqStopSet);
+    }
+
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
         final Tokenizer tokenizer = new StandardTokenizer();

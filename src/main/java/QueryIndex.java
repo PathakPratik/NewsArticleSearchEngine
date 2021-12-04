@@ -1,6 +1,9 @@
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.codecs.TermStats;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -14,10 +17,9 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.misc.*;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
@@ -31,8 +33,12 @@ public class QueryIndex {
     private final short cMAX_RESULTS_FIRST_PASS = 10;
     //<! The maximum number of search results that are retrieved for the final query
     private final short cMAX_RESULTS_SECOND_PASS = 1000;
+    //<! The high frequency words limit
+    private final int cMAX_FREQ_WORD_LIMIT = 180000;
     //<! The location where the file with the rankings of the queries is stored
     private final String cRANKINGS_LOCATION = "./rankings.txt";
+    //<! The location where the file with the high freq words is stored
+    private final String cFREQ_LIST_LOCATION = "./freqlist.txt";
     //<! identifier for the analyzer that is to be created from AnalyzerSimilarityFactory
     private String mAnalyzerString;
     //<! identifier for the similarity that is to be created from AnalyzerSimilarityFactory
@@ -74,12 +80,15 @@ public class QueryIndex {
      * @throws ParseException when a query could not be parsed
      */
     public void queryMap(HashMap<Integer,String> queries,
-                         String indexDirectoryLocation) throws IOException, ParseException {
+                         String indexDirectoryLocation) throws Exception {
         Directory directory = FSDirectory.open(Paths.get(indexDirectoryLocation));
         DirectoryReader directoryReader = DirectoryReader.open(directory);
         IndexReader indexReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
         indexSearcher.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
+
+        generateHighFreqWordList(indexReader);
+
         MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{FieldNames.TEXT.getName()},
                 AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query"));
 
@@ -133,6 +142,40 @@ public class QueryIndex {
         directoryReader.close();
         directory.close();
         System.out.println("Finished querying");
+    }
+
+    /**
+     * This file generates a high frequency list from the index and saves in a file
+     * @param indexReader This is the instance of Index Reader
+     * @throws Exception
+     */
+
+    private void generateHighFreqWordList(IndexReader indexReader) throws Exception {
+        File file = new File(cFREQ_LIST_LOCATION);
+
+        FileWriter writer;
+
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        else{
+            return;
+        }
+
+        writer = new FileWriter(file, true);
+
+        org.apache.lucene.misc.TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, 2500, "text", new HighFreqTerms.TotalTermFreqComparator());
+
+        ArrayList<String> stopWordlist = new ArrayList<>();
+
+        for (org.apache.lucene.misc.TermStats commonTerm : commonTerms) {
+            if( commonTerm.totalTermFreq > cMAX_FREQ_WORD_LIMIT ) {
+                stopWordlist.add(commonTerm.termtext.utf8ToString());
+                writer.append(commonTerm.termtext.utf8ToString() + System.lineSeparator());
+            }
+        }
+
+        writer.close();
     }
 
     /**
