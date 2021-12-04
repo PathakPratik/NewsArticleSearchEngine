@@ -22,11 +22,13 @@ public class AnalyzerSimilarityFactory {
     public static Analyzer getAnalyzer(String analyzerType, String stage, CharArraySet stopSet) throws FileNotFoundException {
 
         Scanner s = new Scanner(new File("./freqlist.txt"));
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> stopWordlist = new ArrayList<String>();
         while (s.hasNext()){
-            list.add(s.next());
+            stopWordlist.add(s.next());
         }
         s.close();
+
+        CharArraySet HighFreqStopSet = new CharArraySet(stopWordlist, true);
 
         if(analyzerType.equalsIgnoreCase("standard")) {
             return new StandardAnalyzer();
@@ -39,9 +41,9 @@ public class AnalyzerSimilarityFactory {
         }
         if(analyzerType.equalsIgnoreCase("custom")) {
             if(stage.equalsIgnoreCase("index")) {
-                return new CustomIndexAnalyzer();
+                return new CustomIndexAnalyzer(HighFreqStopSet);
             } else if(stage.equalsIgnoreCase("query")){
-                return new CustomQueryAnalyzer(stopSet);
+                return new CustomQueryAnalyzer(HighFreqStopSet);
             }
         }
 

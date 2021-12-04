@@ -21,6 +21,10 @@ public class CustomIndexAnalyzer extends Analyzer {
 
     private CharArraySet mStopWordCharArrayList = new CharArraySet(Arrays.asList(mStopWordList),true);
 
+    public CustomIndexAnalyzer(CharArraySet stopList) {
+        this.mStopWordCharArrayList.addAll(stopList);
+    }
+
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
         final Tokenizer tokenizer = new StandardTokenizer();
