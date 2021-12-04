@@ -90,7 +90,7 @@ public class QueryIndex {
 
         FileWriter writer1 = new FileWriter(cFREQ_LIST_LOCATION);
 
-        org.apache.lucene.misc.TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, 500, "text", new HighFreqTerms.TotalTermFreqComparator());
+        org.apache.lucene.misc.TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, 1500, "text", new HighFreqTerms.TotalTermFreqComparator());
 
         ArrayList<String> stopWordlist = new ArrayList<String>();
 
@@ -100,6 +100,8 @@ public class QueryIndex {
                 writer1.write(commonTerm.termtext.utf8ToString() + System.lineSeparator());
             }
         }
+
+        System.out.println(stopWordlist.size());
 
         CharArraySet stopSet = new CharArraySet(stopWordlist, true);
 
