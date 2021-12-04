@@ -56,7 +56,7 @@ public class Parser {
         Directory directory = FSDirectory.open(Paths.get(indexDirectoryLocation));
 
         // Set up an index writer to add process and save documents to the index
-        IndexWriterConfig config = new IndexWriterConfig(AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString));
+        IndexWriterConfig config = new IndexWriterConfig(AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "index"));
         config.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter indexWriter = new IndexWriter(directory, config);

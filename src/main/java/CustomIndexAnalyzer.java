@@ -10,7 +10,7 @@ import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 import java.util.Arrays;
 
-public class CustomAnalyzer extends Analyzer {
+public class CustomIndexAnalyzer extends Analyzer {
     private final String[] mStopWordList = {
             "a", "an", "and", "are","aren't", "as", "at", "be", "but", "by","can","can't", "does","how",
             "for", "if", "in", "into", "is", "it","have","haven't","why","has",
