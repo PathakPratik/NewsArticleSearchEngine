@@ -12,6 +12,9 @@ import java.util.Scanner;
 
 public class AnalyzerSimilarityFactory {
 
+    //<! The location where the file with the high freq words is stored
+    private static final String cFREQ_LIST_LOCATION = "./freqlist.txt";
+
     /**
      * This method constructs and returns different types of
      * analyzers based on an input string
@@ -21,14 +24,20 @@ public class AnalyzerSimilarityFactory {
      */
     public static Analyzer getAnalyzer(String analyzerType, String stage) throws FileNotFoundException {
 
-        Scanner s = new Scanner(new File("./freqlist.txt"));
-        ArrayList<String> HighFreqstopWordlist = new ArrayList<String>();
-        while (s.hasNext()){
-            HighFreqstopWordlist.add(s.next());
-        }
-        s.close();
+        File file = new File(cFREQ_LIST_LOCATION);
 
-        CharArraySet HighFreqStopSet = new CharArraySet(HighFreqstopWordlist, true);
+        CharArraySet HighFreqStopSet = new CharArraySet(new ArrayList<>(), true);
+
+        if (file.exists()) {
+            Scanner s = new Scanner(file);
+            ArrayList<String> HighFreqstopWordlist = new ArrayList<>();
+            while (s.hasNext()) {
+                HighFreqstopWordlist.add(s.next());
+            }
+            s.close();
+
+            HighFreqStopSet.addAll(HighFreqstopWordlist);
+        }
 
         if(analyzerType.equalsIgnoreCase("standard")) {
             return new StandardAnalyzer();
