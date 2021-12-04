@@ -90,7 +90,7 @@ public class QueryIndex {
         ArrayList<String> stopWordlist = new ArrayList<String>();
 
         for (org.apache.lucene.misc.TermStats commonTerm : commonTerms) {
-            if( commonTerm.totalTermFreq > 120000 ) {
+            if( commonTerm.totalTermFreq > 150000 ) {
                 stopWordlist.add(commonTerm.termtext.utf8ToString());
             }
         }
