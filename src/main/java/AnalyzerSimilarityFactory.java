@@ -5,6 +5,11 @@ import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.similarities.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
 public class AnalyzerSimilarityFactory {
 
     /**
@@ -14,7 +19,15 @@ public class AnalyzerSimilarityFactory {
      * @param analyzerType the analyzer that should be returned
      * @return the respective analyzer
      */
-    public static Analyzer getAnalyzer(String analyzerType, String stage, CharArraySet stopSet){
+    public static Analyzer getAnalyzer(String analyzerType, String stage, CharArraySet stopSet) throws FileNotFoundException {
+
+        Scanner s = new Scanner(new File("./freqlist.txt"));
+        ArrayList<String> list = new ArrayList<String>();
+        while (s.hasNext()){
+            list.add(s.next());
+        }
+        s.close();
+
         if(analyzerType.equalsIgnoreCase("standard")) {
             return new StandardAnalyzer();
         }

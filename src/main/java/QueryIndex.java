@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
+import java.io.FileWriter;
 
 public class QueryIndex {
     //<! The number of terms the original query is expanded with
@@ -37,6 +38,8 @@ public class QueryIndex {
     private final short cMAX_RESULTS_SECOND_PASS = 1000;
     //<! The location where the file with the rankings of the queries is stored
     private final String cRANKINGS_LOCATION = "./rankings.txt";
+    //<! The location where the file with the high freq words is stored
+    private final String cFREQ_LIST_LOCATION = "./freqlist.txt";
     //<! identifier for the analyzer that is to be created from AnalyzerSimilarityFactory
     private String mAnalyzerString;
     //<! identifier for the similarity that is to be created from AnalyzerSimilarityFactory
@@ -85,6 +88,8 @@ public class QueryIndex {
         IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
         indexSearcher.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
 
+        FileWriter writer1 = new FileWriter(cFREQ_LIST_LOCATION);
+
         org.apache.lucene.misc.TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, 500, "text", new HighFreqTerms.TotalTermFreqComparator());
 
         ArrayList<String> stopWordlist = new ArrayList<String>();
@@ -92,10 +97,13 @@ public class QueryIndex {
         for (org.apache.lucene.misc.TermStats commonTerm : commonTerms) {
             if( commonTerm.totalTermFreq > 180000 ) {
                 stopWordlist.add(commonTerm.termtext.utf8ToString());
+                writer1.write(commonTerm.termtext.utf8ToString() + System.lineSeparator());
             }
         }
 
         CharArraySet stopSet = new CharArraySet(stopWordlist, true);
+
+        writer1.close();
 
         MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{FieldNames.TEXT.getName()},
                 AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query", stopSet));
