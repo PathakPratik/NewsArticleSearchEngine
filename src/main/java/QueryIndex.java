@@ -1,6 +1,9 @@
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.codecs.TermStats;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -14,6 +17,7 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.misc.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -74,14 +78,27 @@ public class QueryIndex {
      * @throws ParseException when a query could not be parsed
      */
     public void queryMap(HashMap<Integer,String> queries,
-                         String indexDirectoryLocation) throws IOException, ParseException {
+                         String indexDirectoryLocation) throws Exception {
         Directory directory = FSDirectory.open(Paths.get(indexDirectoryLocation));
         DirectoryReader directoryReader = DirectoryReader.open(directory);
         IndexReader indexReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
         indexSearcher.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
+
+        org.apache.lucene.misc.TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, 500, "text", new HighFreqTerms.TotalTermFreqComparator());
+
+        ArrayList<String> stopWordlist = new ArrayList<String>();
+
+        for (org.apache.lucene.misc.TermStats commonTerm : commonTerms) {
+            if( commonTerm.totalTermFreq > 70000 ) {
+                stopWordlist.add(commonTerm.termtext.utf8ToString());
+            }
+        }
+
+        CharArraySet stopSet = new CharArraySet(stopWordlist, true);
+
         MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{FieldNames.TEXT.getName()},
-                AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query"));
+                AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query", stopSet));
 
         PrintWriter writer = new PrintWriter(cRANKINGS_LOCATION, StandardCharsets.UTF_8);
         System.out.println("Started querying");
@@ -94,7 +111,7 @@ public class QueryIndex {
             for (ScoreDoc hit : hits)
             {
                 Document hitDoc = indexSearcher.doc(hit.doc);
-                List<String> termList = tokenizeString(Arrays.toString(hitDoc.getValues(FieldNames.TEXT.getName())));
+                List<String> termList = tokenizeString(Arrays.toString(hitDoc.getValues(FieldNames.TEXT.getName())), stopSet);
                 for (String currTerm : termList) {
                     termWeightMap.put(currTerm, calculateTermWeight(currTerm,
                             termList,
@@ -142,10 +159,10 @@ public class QueryIndex {
      *  @return the tokenized string
      */
     //Credits: https://stackoverflow.com/questions/6334692/how-to-use-a-lucene-analyzer-to-tokenize-a-string
-    private List<String> tokenizeString(String string) {
+    private List<String> tokenizeString(String string, CharArraySet stopSet) {
         List<String> result = new ArrayList<String>();
         try {
-            Analyzer analyzer = AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query");
+            Analyzer analyzer = AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "query", stopSet);
             TokenStream stream  = analyzer.tokenStream(null, new StringReader(string));
             stream.reset();
             while (stream.incrementToken()) {

@@ -62,6 +62,12 @@
             <version>8.11.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-misc</artifactId>
+            <version>8.11.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

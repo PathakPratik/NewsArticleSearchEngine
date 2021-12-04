@@ -1,4 +1,5 @@
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -13,7 +14,7 @@ public class AnalyzerSimilarityFactory {
      * @param analyzerType the analyzer that should be returned
      * @return the respective analyzer
      */
-    public static Analyzer getAnalyzer(String analyzerType, String stage){
+    public static Analyzer getAnalyzer(String analyzerType, String stage, CharArraySet stopSet){
         if(analyzerType.equalsIgnoreCase("standard")) {
             return new StandardAnalyzer();
         }
@@ -27,7 +28,7 @@ public class AnalyzerSimilarityFactory {
             if(stage.equalsIgnoreCase("index")) {
                 return new CustomIndexAnalyzer();
             } else if(stage.equalsIgnoreCase("query")){
-                return new CustomQueryAnalyzer();
+                return new CustomQueryAnalyzer(stopSet);
             }
         }
 

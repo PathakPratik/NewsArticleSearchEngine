@@ -1,3 +1,4 @@
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
@@ -56,7 +57,7 @@ public class Parser {
         Directory directory = FSDirectory.open(Paths.get(indexDirectoryLocation));
 
         // Set up an index writer to add process and save documents to the index
-        IndexWriterConfig config = new IndexWriterConfig(AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "index"));
+        IndexWriterConfig config = new IndexWriterConfig(AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "index", EnglishAnalyzer.ENGLISH_STOP_WORDS_SET));
         config.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter indexWriter = new IndexWriter(directory, config);
