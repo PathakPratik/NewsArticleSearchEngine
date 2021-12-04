@@ -1,4 +1,3 @@
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
@@ -29,6 +28,8 @@ public class Parser {
     private static final String cQUERIES_TITLE = "title";
     // Identifier used to separate the individual queries
     private static final String cQUERIES_DESCRIPTION = "desc";
+    // Identifier used to separate the individual queries
+    private static final String cQUERIES_NARRATIVE = "narr";
     // Identifier used to identify the topic number
     private static final String cQUERIES_NUM = "num";
 
@@ -41,7 +42,7 @@ public class Parser {
     /**
      * This method extracts all the relevant info from the dataset that we need
      * for creating the index. This method creates the index after extraction
-     * 
+     *
      * @param ftLocation             location of the Financial Times Limited dataset
      * @param fr94Location           location of the Federal Register dataset
      * @param fbisLocation           location of the Foreign Broadcast Information
@@ -52,12 +53,12 @@ public class Parser {
      * @return true if parsing was successful. Otherwise, false
      */
     public boolean createIndex(String ftLocation, String fr94Location, String fbisLocation, String latimesLocation,
-            String indexDirectoryLocation) throws IOException {
+                               String indexDirectoryLocation) throws IOException {
         System.out.println(Paths.get(indexDirectoryLocation).toAbsolutePath());
         Directory directory = FSDirectory.open(Paths.get(indexDirectoryLocation));
 
         // Set up an index writer to add process and save documents to the index
-        IndexWriterConfig config = new IndexWriterConfig(AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString, "index"));
+        IndexWriterConfig config = new IndexWriterConfig(AnalyzerSimilarityFactory.getAnalyzer(mAnalyzerString,"index"));
         config.setSimilarity(AnalyzerSimilarityFactory.getSimilarity(mSimilarityString));
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         IndexWriter indexWriter = new IndexWriter(directory, config);
@@ -155,9 +156,9 @@ public class Parser {
      * @return a map <Integer,String> which maps id of a query to its search text
      * @throws IOException if the topics query file could not be read in
      */
-    public static HashMap<Integer, String> createQueries(String queryFileLocation) throws IOException {
+    public HashMap<Integer, String[]> createQueries(String queryFileLocation) throws IOException {
         System.out.println("Started extracting queries");
-        HashMap<Integer, String> queryMap = new HashMap<>();
+        HashMap<Integer, String[]> queryMap = new HashMap<>();
         Scanner scan = new Scanner(new File(queryFileLocation));
         scan.useDelimiter(Pattern.compile(cQUERIES_SEPARATOR));
 
@@ -172,10 +173,17 @@ public class Parser {
                     get(0).
                     ownText().
                     replace("Description: ", "");   // the desc tag always contains a first line
-                                                                    // "Description: ". We replace this, since
-                                                                    // this is of no use for the queries
-            queryMap.put(id, title + " " + description);
-            id++;
+            // "Description: ". We replace this, since
+            // this is of no use for the queries
+            String narrative = docu.body().select(cQUERIES_NARRATIVE).
+                    get(0).
+                    ownText().
+                    replace("Narrative: ", "");   // the desc tag always contains a first line
+            // "Description: ". We replace this, since
+            // this is of no use for the queries
+            String[] queryArray = {title,description,narrative};
+
+            queryMap.put(id, queryArray);
         }
 
         System.out.println("Finished extracting queries");

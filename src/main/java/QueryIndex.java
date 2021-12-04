@@ -26,9 +26,9 @@ import java.util.*;
 
 public class QueryIndex {
     //<! The number of terms the original query is expanded with
-    private final short cTOP_TERMS_LIMIT = 20;
+    private final short cTOP_TERMS_LIMIT = 45;
     //<! The weight factor for the terms that are used for query expansion
-    private final float cEXPANDED_TERM_WEIGHT = 0.5F;
+    private final float cEXPANDED_TERM_WEIGHT = 0.75F;
     //<! The maximum number of search results that are retrieved for the first iteration of the query
     private final short cMAX_RESULTS_FIRST_PASS = 10;
     //<! The maximum number of search results that are retrieved for the final query
@@ -79,7 +79,7 @@ public class QueryIndex {
      * @throws IOException when the directory could not be opened
      * @throws ParseException when a query could not be parsed
      */
-    public void queryMap(HashMap<Integer,String> queries,
+    public void queryMap(HashMap<Integer,String[]> queries,
                          String indexDirectoryLocation) throws Exception {
         Directory directory = FSDirectory.open(Paths.get(indexDirectoryLocation));
         DirectoryReader directoryReader = DirectoryReader.open(directory);
@@ -95,7 +95,25 @@ public class QueryIndex {
         PrintWriter writer = new PrintWriter(cRANKINGS_LOCATION, StandardCharsets.UTF_8);
         System.out.println("Started querying");
         for (int id : queries.keySet()) {
-            Query origQuery = parser.parse(QueryParser.escape(queries.get(id)));
+            List<String> titleStrings = tokenizeString(QueryParser.escape(queries.get(id)[0]));
+            List<String> descriptionStrings = tokenizeString(QueryParser.escape(queries.get(id)[1]));
+            List<String> narrativeStrings = tokenizeString(QueryParser.escape(queries.get(id)[2]));
+            StringBuilder queryBuilder = new StringBuilder();
+            for (String currTerm : titleStrings){
+                //add weights to terms
+                queryBuilder.append(currTerm).append("^").append(1.5F).append(" ");
+            }
+            for (String currTerm : descriptionStrings){
+                //add weights to terms
+                queryBuilder.append(currTerm).append("^").append(0.9F).append(" ");
+            }
+            for (String currTerm : narrativeStrings){
+                //add weights to terms
+                queryBuilder.append(currTerm).append("^").append(0.3F).append(" ");
+            }
+
+            //construct query for first pass
+            Query origQuery = parser.parse(queryBuilder.toString());
 
             //get top results for first iteration of the query and extract their terms
             ScoreDoc[] hits = indexSearcher.search(origQuery, cMAX_RESULTS_FIRST_PASS).scoreDocs;
@@ -120,8 +138,6 @@ public class QueryIndex {
             double  maxTermWeight = (Collections.max(topTermMap.values()));
 
             //construct the final query with the extracted terms
-            StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append(origQuery.toString()).append(" ");
             for (String currTerm : topTermMap.keySet()){
                 float weight = (float) (cEXPANDED_TERM_WEIGHT * (topTermMap.get(currTerm)/maxTermWeight));
                 //add weights to terms

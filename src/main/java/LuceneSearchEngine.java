@@ -47,7 +47,7 @@ public class LuceneSearchEngine {
                 System.out.println("Using existing index");
             }
 
-            HashMap<Integer,String> queries  = parser.createQueries(cTOPICS_LOCATION);
+            HashMap<Integer,String[]> queries  = parser.createQueries(cTOPICS_LOCATION);
             QueryIndex queryIndex = new QueryIndex(args[0] /*the selected analyzer*/,
                              args[1] /*the selected similarity*/);
             queryIndex.queryMap(queries, cINDEX_DIRECTORY_LOCATION);
