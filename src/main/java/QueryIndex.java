@@ -155,9 +155,11 @@ public class QueryIndex {
 
         FileWriter writer;
 
-        if (!file.exists())
-        {
+        if (!file.exists()) {
             file.createNewFile();
+        }
+        else{
+            return;
         }
 
         writer = new FileWriter(file, true);
