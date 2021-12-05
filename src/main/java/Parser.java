@@ -194,6 +194,15 @@ public class Parser {
                 if(!curr.contains("not")){
                     relevantNarrative += curr;
                 }
+                // To handle sentences that contain both relevant & non-relevant
+                String first = curr.split(",")[0];
+                String second = curr.split(",")[1];
+                if(!first.contains("not")){
+                    relevantNarrative += first;
+                }
+                if(!second.contains("not")){
+                    relevantNarrative += second;
+                }
             }
 
             String[] queryArray = {title,description,relevantNarrative};
