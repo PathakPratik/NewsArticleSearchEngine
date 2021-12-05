@@ -16,7 +16,7 @@ public class CustomIndexAnalyzer extends Analyzer {
             "for", "if", "in", "into", "is", "it","have","haven't","why","has",
             "no", "not", "of", "on", "or", "such","under","over","out",
             "that", "the", "their", "then","them", "there", "these",
-            "they", "this", "to","too", "what", "was", "will", "with","where"
+            "they", "this", "to","too", "what", "was", "will", "with","where", "also"
     };
 
     private CharArraySet mStopWordCharArrayList = new CharArraySet(Arrays.asList(mStopWordList),true);
