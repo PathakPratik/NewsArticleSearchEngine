@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class AnalyzerSimilarityFactory {
 
     //<! The location where the file with the high freq words is stored
-    private static final String cFREQ_LIST_LOCATION = "./freqlist.txt";
+    private static final String cFREQ_LIST_LOCATION = "./docfreqlist.txt";
 
     /**
      * This method constructs and returns different types of
