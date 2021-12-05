@@ -183,15 +183,27 @@ public class Parser {
                                                             // "Narrative: ". We replace this, since
                                                             // this is of no use for the queries
 
-            Pattern re = Pattern.compile("[^.!?\\s][^.!?]*(?:[.!?](?!['\"]?\\s|$)[^.!?]*)*[.!?]?['\"]?(?=\\s|$)", Pattern.MULTILINE | Pattern.COMMENTS);
-            Matcher reMatcher = re.matcher(narrative);
-            String relevantNarrative = "";
-            while (reMatcher.find()) {
-                String curr = reMatcher.group();
-                if(!(curr.contains("not relevant") || curr.contains("irrelevant"))){
-                    relevantNarrative += curr;
+            String[] unprocessedString =
+                    narrative.strip().toLowerCase(Locale.ROOT).split("\\p{Punct}");
+            StringBuilder processedString = new StringBuilder();
+
+            for (String str : unprocessedString) {
+                str = str.strip();
+                if (!((str.contains("not") && str.contains("relevant")) || str.contains("irrelevant"))) {
+                    processedString.append(str.replaceAll("\n", " ")).append(" ");
                 }
             }
+            String relevantNarrative = processedString.toString();
+
+//            Pattern re = Pattern.compile("[^.!?\\s][^.!?]*(?:[.!?](?!['\"]?\\s|$)[^.!?]*)*[.!?]?['\"]?(?=\\s|$)", Pattern.MULTILINE | Pattern.COMMENTS);
+//            Matcher reMatcher = re.matcher(narrative);
+//            String relevantNarrative = "";
+//            while (reMatcher.find()) {
+//                String curr = reMatcher.group();
+//                if(!(curr.contains("not relevant") || curr.contains("irrelevant"))){
+//                    relevantNarrative += curr;
+//                }
+//            }
 //            relevantNarrative = relevantNarrative.replace("relevant", "").
 //                    replace("documents", "").
 //                    replace("document", "");
