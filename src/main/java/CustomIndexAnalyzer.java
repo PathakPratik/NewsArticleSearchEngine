@@ -22,7 +22,7 @@ public class CustomIndexAnalyzer extends Analyzer {
     private CharArraySet mStopWordCharArrayList = new CharArraySet(Arrays.asList(mStopWordList),true);
 
     public CustomIndexAnalyzer(CharArraySet HighFreqStopSet) {
-        this.mStopWordCharArrayList.addAll(HighFreqStopSet);
+//        this.mStopWordCharArrayList.addAll(HighFreqStopSet);
     }
 
     @Override
