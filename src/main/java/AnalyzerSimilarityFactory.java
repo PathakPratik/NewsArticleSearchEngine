@@ -13,7 +13,8 @@ import java.util.Scanner;
 public class AnalyzerSimilarityFactory {
 
     //<! The location where the file with the high freq words is stored
-    private static final String cFREQ_LIST_LOCATION = "./docfreqlist.txt";
+    private static final String cDOC_FREQ_LIST_LOCATION = "./docfreqlist.txt";
+    private static final String cFREQ_LIST_LOCATION = "./freqlist.txt";
 
     /**
      * This method constructs and returns different types of
@@ -30,6 +31,19 @@ public class AnalyzerSimilarityFactory {
 
         if (file.exists()) {
             Scanner s = new Scanner(file);
+            ArrayList<String> HighFreqstopWordlist = new ArrayList<>();
+            while (s.hasNext()) {
+                HighFreqstopWordlist.add(s.next());
+            }
+            s.close();
+
+            HighFreqStopSet.addAll(HighFreqstopWordlist);
+        }
+
+        File file2 = new File(cDOC_FREQ_LIST_LOCATION);
+
+        if (file2.exists()) {
+            Scanner s = new Scanner(file2);
             ArrayList<String> HighFreqstopWordlist = new ArrayList<>();
             while (s.hasNext()) {
                 HighFreqstopWordlist.add(s.next());
