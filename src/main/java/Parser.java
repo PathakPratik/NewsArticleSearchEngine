@@ -192,9 +192,9 @@ public class Parser {
                     relevantNarrative += curr;
                 }
             }
-            relevantNarrative = relevantNarrative.replace("relevant", "").
-                    replace("documents", "").
-                    replace("document", "");
+//            relevantNarrative = relevantNarrative.replace("relevant", "").
+//                    replace("documents", "").
+//                    replace("document", "");
             
             String[] queryArray = {title,description,relevantNarrative};
 
