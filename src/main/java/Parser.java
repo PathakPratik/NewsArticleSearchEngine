@@ -179,7 +179,8 @@ public class Parser {
             String narrative = docu.body().select(cQUERIES_NARRATIVE).
                     get(0).
                     ownText().
-                    replace("Narrative: ", "");   // the desc tag always contains a first line
+                    replace("Narrative: ", "")
+                    .replace("relevant", "").replace("documents", "").replace("document", "").replace("also", "");   // the desc tag always contains a first line
             // "Description: ". We replace this, since
             // this is of no use for the queries
 
