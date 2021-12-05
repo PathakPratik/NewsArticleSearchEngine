@@ -9,7 +9,6 @@ import org.apache.lucene.store.FSDirectory;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.*;
