@@ -26,9 +26,9 @@ import java.util.*;
 
 public class QueryIndex {
     //<! The number of terms the original query is expanded with
-    private final short cTOP_TERMS_LIMIT = 45;
+    private final short cTOP_TERMS_LIMIT = 50;
     //<! The weight factor for the terms that are used for query expansion
-    private final float cEXPANDED_TERM_WEIGHT = 0.75F;
+    private final float cEXPANDED_TERM_WEIGHT = 0.85F;
     //<! The maximum number of search results that are retrieved for the first iteration of the query
     private final short cMAX_RESULTS_FIRST_PASS = 10;
     //<! The maximum number of search results that are retrieved for the final query
