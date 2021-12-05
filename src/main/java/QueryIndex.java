@@ -38,7 +38,7 @@ public class QueryIndex {
     //<! The location where the file with the rankings of the queries is stored
     private final String cRANKINGS_LOCATION = "./rankings.txt";
     //<! The location where the file with the high freq words is stored
-    private final String cFREQ_LIST_LOCATION = "./freqlist.txt";
+    private final String cFREQ_LIST_LOCATION = "./docfreqlist.txt";
     //<! identifier for the analyzer that is to be created from AnalyzerSimilarityFactory
     private String mAnalyzerString;
     //<! identifier for the similarity that is to be created from AnalyzerSimilarityFactory
@@ -180,12 +180,13 @@ public class QueryIndex {
 
         writer = new FileWriter(file, true);
 
-        org.apache.lucene.misc.TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, 2500, "text", new HighFreqTerms.TotalTermFreqComparator());
+        org.apache.lucene.misc.TermStats[] commonTerms = HighFreqTerms.getHighFreqTerms(indexReader, 5000, "text", new HighFreqTerms.TotalTermFreqComparator());
 
         ArrayList<String> stopWordlist = new ArrayList<>();
 
         for (org.apache.lucene.misc.TermStats commonTerm : commonTerms) {
-            if( commonTerm.totalTermFreq > cMAX_FREQ_WORD_LIMIT ) {
+            if( commonTerm.docFreq > 100000 ) {
+//                System.out.println(commonTerm);
                 stopWordlist.add(commonTerm.termtext.utf8ToString());
                 writer.append(commonTerm.termtext.utf8ToString() + System.lineSeparator());
             }
