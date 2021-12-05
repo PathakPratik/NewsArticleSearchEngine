@@ -173,14 +173,18 @@ public class Parser {
                     get(0).
                     ownText().
                     replace("Description: ", "");   // the desc tag always contains a first line
-            // "Description: ". We replace this, since
-            // this is of no use for the queries
+                                                                    // "Description: ". We replace this, since
+                                                                    // this is of no use for the queries
             String narrative = docu.body().select(cQUERIES_NARRATIVE).
                     get(0).
                     ownText().
-                    replace("Narrative: ", "");   // the desc tag always contains a first line
-            // "Description: ". We replace this, since
-            // this is of no use for the queries
+                    replace("Narrative: ", "")
+                    .replace("relevant", "")
+                    .replace("documents", "")
+                    .replace("document", "");   // the narrative tag always contains a first line
+                                                            // "Narrative: ". We replace this, since
+                                                            // this is of no use for the queries
+            
             String[] queryArray = {title,description,narrative};
 
             queryMap.put(id, queryArray);
