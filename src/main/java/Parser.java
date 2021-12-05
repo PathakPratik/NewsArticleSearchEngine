@@ -9,6 +9,7 @@ import org.apache.lucene.store.FSDirectory;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.*;
@@ -182,14 +183,17 @@ public class Parser {
             // "Description: ". We replace this, since
             // this is of no use for the queries
 
-//            String finalNarr = "";
-//            for (String curr: narrative.split(".")) {
-//                if(!curr.contains("not")){
-//                    finalNarr += curr;
-//                }
-//            }
+            Pattern re = Pattern.compile("[^.!?\\s][^.!?]*(?:[.!?](?!['\"]?\\s|$)[^.!?]*)*[.!?]?['\"]?(?=\\s|$)", Pattern.MULTILINE | Pattern.COMMENTS);
+            Matcher reMatcher = re.matcher(narrative);
+            String finalNarr = "";
+            while (reMatcher.find()) {
+                String curr = reMatcher.group();
+                if(!curr.contains("not")){
+                    finalNarr += curr;
+                }
+            }
 
-            String[] queryArray = {title,description,narrative};
+            String[] queryArray = {title,description,finalNarr};
 
             queryMap.put(id, queryArray);
         }
