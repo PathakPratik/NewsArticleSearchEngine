@@ -174,27 +174,29 @@ public class Parser {
                     get(0).
                     ownText().
                     replace("Description: ", "");   // the desc tag always contains a first line
-            // "Description: ". We replace this, since
-            // this is of no use for the queries
+                                                                    // "Description: ". We replace this, since
+                                                                    // this is of no use for the queries
             String narrative = docu.body().select(cQUERIES_NARRATIVE).
                     get(0).
                     ownText().
-                    replace("Narrative: ", "")
-                    .replace("relevant", "").replace("documents", "").replace("document", "").replace("also", "");   // the desc tag always contains a first line
-            // "Description: ". We replace this, since
-            // this is of no use for the queries
+                    replace("Narrative: ", "").
+                    replace("relevant", "").
+                    replace("documents", "").
+                    replace("document", "");   // the narrative tag always contains a first line
+                                                            // "Narrative: ". We replace this, since
+                                                            // this is of no use for the queries
 
             Pattern re = Pattern.compile("[^.!?\\s][^.!?]*(?:[.!?](?!['\"]?\\s|$)[^.!?]*)*[.!?]?['\"]?(?=\\s|$)", Pattern.MULTILINE | Pattern.COMMENTS);
             Matcher reMatcher = re.matcher(narrative);
-            String finalNarr = "";
+            String relevantNarrative = "";
             while (reMatcher.find()) {
                 String curr = reMatcher.group();
                 if(!curr.contains("not")){
-                    finalNarr += curr;
+                    relevantNarrative += curr;
                 }
             }
 
-            String[] queryArray = {title,description,finalNarr};
+            String[] queryArray = {title,description,relevantNarrative};
 
             queryMap.put(id, queryArray);
         }
