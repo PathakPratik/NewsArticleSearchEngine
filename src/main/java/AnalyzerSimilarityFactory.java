@@ -69,7 +69,7 @@ public class AnalyzerSimilarityFactory {
      */
     public static Similarity getSimilarity(String similaritiesType){
         if(similaritiesType.equalsIgnoreCase("bm25")) {
-            return new BM25Similarity(1.2F,0.9F);
+            return new BM25Similarity(1.1F,0.9F);
         }
         if(similaritiesType.equalsIgnoreCase("classic")) {
             return new ClassicSimilarity();
