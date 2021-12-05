@@ -195,14 +195,14 @@ public class Parser {
                     relevantNarrative += curr;
                 }
                 // To handle case for relevant & non-relevant together in sentence
-                if(curr.contains(",")) {
-                    String[] splits = curr.split(",");
-                    for (String split : splits) {
-                        if (!split.contains("not")) {
-                            relevantNarrative += split;
-                        }
-                    }
-                }
+//                if(curr.contains(",")) {
+//                    String[] splits = curr.split(",");
+//                    for (String split : splits) {
+//                        if (!split.contains("not")) {
+//                            relevantNarrative += split;
+//                        }
+//                    }
+//                }
             }
 
             String[] queryArray = {title,description,relevantNarrative};
