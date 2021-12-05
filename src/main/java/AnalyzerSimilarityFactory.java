@@ -40,18 +40,18 @@ public class AnalyzerSimilarityFactory {
             HighFreqStopSet.addAll(HighFreqstopWordlist);
         }
 
-        File file2 = new File(cDOC_FREQ_LIST_LOCATION);
-
-        if (file2.exists()) {
-            Scanner s = new Scanner(file2);
-            ArrayList<String> HighFreqstopWordlist = new ArrayList<>();
-            while (s.hasNext()) {
-                HighFreqstopWordlist.add(s.next());
-            }
-            s.close();
-
-            HighFreqStopSet.addAll(HighFreqstopWordlist);
-        }
+//        File file2 = new File(cDOC_FREQ_LIST_LOCATION);
+//
+//        if (file2.exists()) {
+//            Scanner s = new Scanner(file2);
+//            ArrayList<String> HighFreqstopWordlist = new ArrayList<>();
+//            while (s.hasNext()) {
+//                HighFreqstopWordlist.add(s.next());
+//            }
+//            s.close();
+//
+//            HighFreqStopSet.addAll(HighFreqstopWordlist);
+//        }
 
         if(analyzerType.equalsIgnoreCase("standard")) {
             return new StandardAnalyzer();
