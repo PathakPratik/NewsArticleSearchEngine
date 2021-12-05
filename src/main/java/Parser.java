@@ -182,14 +182,14 @@ public class Parser {
             // "Description: ". We replace this, since
             // this is of no use for the queries
 
-            String finalNarr = "";
-            for (String curr: narrative.split(".")) {
-                if(!curr.contains("not")){
-                    finalNarr += curr;
-                }
-            }
+//            String finalNarr = "";
+//            for (String curr: narrative.split(".")) {
+//                if(!curr.contains("not")){
+//                    finalNarr += curr;
+//                }
+//            }
 
-            String[] queryArray = {title,description,finalNarr};
+            String[] queryArray = {title,description,narrative};
 
             queryMap.put(id, queryArray);
         }
