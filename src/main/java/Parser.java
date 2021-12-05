@@ -179,36 +179,14 @@ public class Parser {
             String narrative = docu.body().select(cQUERIES_NARRATIVE).
                     get(0).
                     ownText().
-                    replace("Narrative: ", "");   // the narrative tag always contains a first line
+                    replace("Narrative: ", "")
+                    .replace("relevant", "")
+                    .replace("documents", "")
+                    .replace("document", "");   // the narrative tag always contains a first line
                                                             // "Narrative: ". We replace this, since
                                                             // this is of no use for the queries
-
-            String[] unprocessedString =
-                    narrative.strip().toLowerCase(Locale.ROOT).split("\\p{Punct}");
-            StringBuilder processedString = new StringBuilder();
-
-            for (String str : unprocessedString) {
-                str = str.strip();
-                if (!((str.contains("not") && str.contains("relevant")) || str.contains("irrelevant"))) {
-                    processedString.append(str.replaceAll("\n", " ")).append(" ");
-                }
-            }
-            String relevantNarrative = processedString.toString();
-
-//            Pattern re = Pattern.compile("[^.!?\\s][^.!?]*(?:[.!?](?!['\"]?\\s|$)[^.!?]*)*[.!?]?['\"]?(?=\\s|$)", Pattern.MULTILINE | Pattern.COMMENTS);
-//            Matcher reMatcher = re.matcher(narrative);
-//            String relevantNarrative = "";
-//            while (reMatcher.find()) {
-//                String curr = reMatcher.group();
-//                if(!(curr.contains("not relevant") || curr.contains("irrelevant"))){
-//                    relevantNarrative += curr;
-//                }
-//            }
-//            relevantNarrative = relevantNarrative.replace("relevant", "").
-//                    replace("documents", "").
-//                    replace("document", "");
             
-            String[] queryArray = {title,description,relevantNarrative};
+            String[] queryArray = {title,description,narrative};
 
             queryMap.put(id, queryArray);
         }
